@@ -10,8 +10,9 @@ Get-Process powershell | Where-Object {
 # Wait a moment for processes to clean up
 Start-Sleep -Seconds 2
 
-Write-Host "Creating and applying database migration..." -ForegroundColor Cyan
-Set-Location "CareerMatch"
+# Script lives in scripts/, repo root is one level up
+$rootPath = (Get-Item $PSScriptRoot).Parent.FullName
+Set-Location "$rootPath\CareerMatch"
 
 # Create migration
 dotnet ef migrations add AddFeedbackTable
@@ -23,6 +24,6 @@ Write-Host "`nMigration complete!" -ForegroundColor Green
 Write-Host "`nRestarting all services..." -ForegroundColor Cyan
 
 # Go back to root and restart all services
-Set-Location ..
-.\run.bat
+Set-Location $rootPath
+.\scripts\start-all.ps1
 

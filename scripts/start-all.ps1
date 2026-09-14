@@ -7,7 +7,8 @@ Write-Host "Launching AI Service (Port 5001)..." -ForegroundColor Cyan
 $aiServiceDir = "ai-service"
 
 # Resolve absolute path for PYTHONPATH
-$rootPath = $PWD.Path
+# Script lives in scripts/, so repo root is one level up
+$rootPath = (Get-Item $PSScriptRoot).Parent.FullName
 $aiAbsPath = "$rootPath\$aiServiceDir"
 $aiAppAbsPath = "$rootPath\$aiServiceDir\app"
 
@@ -49,7 +50,7 @@ Write-Host 'Starting Uvicorn...' -ForegroundColor Green
 uvicorn app.ai.src.api.main:app --port 5001 --reload --host 0.0.0.0
 "@
 
-$aiScriptPath = "$PWD\start-ai-temp.ps1"
+$aiScriptPath = "$rootPath\scripts\start-ai-temp.ps1"
 Set-Content -Path $aiScriptPath -Value $aiScriptContent
 
 Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-File", "$aiScriptPath"
@@ -61,7 +62,8 @@ Start-Process powershell -ArgumentList "-NoExit", "-Command", "dotnet run" -Work
 
 # 3. Start Frontend (React + Vite)
 Write-Host "Launching Frontend (Port 5173)..." -ForegroundColor Cyan
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "npm run dev" -WorkingDirectory $rootPath
+$frontendDir = "$rootPath\frontend"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "npm run dev" -WorkingDirectory $frontendDir
 
 Write-Host "All services launched!" -ForegroundColor Green
 Write-Host "Backend: http://localhost:5217"
